@@ -6,7 +6,7 @@ from anki.template import TemplateRenderContext, TemplateRenderOutput
 from aqt import mw
 from PyQt5.QtWidgets import QInputDialog
 
-addon_name = "dynamic_gpt_card_examples"
+addon_name = "anki-ai-dynamic-cards"
 addon_path = os.path.join(mw.pm.addonFolder(), addon_name)
 sys.path.append(addon_path)
 import openai
