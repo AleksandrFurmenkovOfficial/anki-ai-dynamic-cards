@@ -17,10 +17,13 @@ def on_card_did_render(output: TemplateRenderOutput, context: TemplateRenderCont
     if not is_api_key_valid:
         return
 
-    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[
-        {"role": "system", "content": "You are an english teacher. You should give 3 examples, each on a new line via <br> tag, for the word which user will provide. The source word should be bold via <b> tags."}, 
-        {"role": "user", "content": output.question_text}])
-    output.question_text = completion.choices[0].message.content
+    try:
+        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[
+            {"role": "system", "content": "You are an english teacher. You should give 3 examples, each on a new line via <br> tag, for the word which user will provide. The source word should be bold via <b> tags."}, 
+            {"role": "user", "content": output.question_text}])
+        output.question_text = completion.choices[0].message.content
+    except:
+        pass
 
 api_key_file = os.path.join(addon_path, "api_key.txt")
 api_key = ""
