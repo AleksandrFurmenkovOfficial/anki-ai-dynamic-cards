@@ -1,5 +1,9 @@
 # Anki AI Dynamic Cards Add-on
-Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example sentences related to the words you are learning, using the artificial intelligence tool ChatGPT. This add-on provides a unique way to improve the effectiveness of memorizing new words and their usage in context, giving users the ability to practice real-world scenarios.
+Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example sentences related to the words you are learning, using the artificial intelligence tool ChatGPT. This add-on provides a unique way to improve the effectiveness of memorizing new words and their usage in context, giving users the ability to practice real-world scenarios. These generated examples don't stored in database.
+
+! The async/await does not supported in hooks now, therefore the addon can freeze the UI until response from OpenAI will be get.
+
+!! This is a beta concept release.
 
 ## Installation
 To install Anki AI Dynamic Cards, you need to download the add-on package `anki-ai-dynamic-cards.zip` and install it manually. You can do this by following these steps:
