@@ -1,13 +1,11 @@
 # Anki AI Dynamic Cards Add-on
-Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example sentences related to the words you are learning, using the artificial intelligence tool ChatGPT. This add-on provides a unique way to improve the effectiveness of memorizing new words and their usage in context, giving users the ability to practice real-world scenarios. These generated examples don't stored in database.
-
-! The async/await does not supported in hooks now, therefore the addon can freeze the UI until response from OpenAI will be get.
+Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example sentences related to the *english* words you are learning, using the artificial intelligence tool ChatGPT. This add-on provides a unique way to improve the effectiveness of memorizing new words and their usage in context, giving users the ability to practice real-world scenarios. These generated examples don't stored in database.
 
 !! This is a beta concept release.
 
 ## Installation
 To install Anki AI Dynamic Cards, you need to download the add-on package `anki-ai-dynamic-cards.zip` and install it manually. You can do this by following these steps:
-- Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v1)
+- Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v2)
 - Find out an Anki add-ons directory. In Anki, select Tools > Add-ons > View Files. This will open the Anki add-ons directory
 - Extract the downloaded package `anki-ai-dynamic-cards.zip` into the add-ons directory
 - Restart Anki
@@ -17,10 +15,9 @@ To install Anki AI Dynamic Cards, you need to download the add-on package `anki-
 To install the addon directly from the sources you need:
 - Clone the repo
 - Find out an Anki add-ons directory. In Anki, select Tools > Add-ons > View Files. This will open the Anki add-ons directory
-- `pip install -r openai -t ANKI_ADDONS_DIRECTORY`
 - Restart Anki
 - Register on openai.com and obtain an API key
 - Use the key in the dialog box when prompted
 
 ## Usage
-To use Anki AI Dynamic Cards, you need to create a deck with cards that contains just a one word you want to memorize. Anki AI Dynamic Cards will automatically generate an example sentence for the word you are learning, using ChatGPT. You can then review the card as usual.
+To use Anki AI Dynamic Cards, you need to create a deck with cards that contains just a one word or phrase you want to memorize. Anki AI Dynamic Cards will automatically generate an example sentence for the word you are learning, using ChatGPT. You can then review the card as usual.
