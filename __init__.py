@@ -52,6 +52,19 @@ def prepare(html, card, context):
         return text;
     }
 
+    let card_messages = [
+        {
+            "role": "system",
+            "content": "You are an language teacher. Please provide a meaningful example for a provided word or phrase. The source word or phrase should be bolded using <b> tags. Do not write anything else except the example."
+        }, {
+            "role": "user",
+            "content": "Please give me another sentence for the word or phrase 'to deter', use the same language." 
+        }, {
+            "role": "assistant",
+            "content": "The bright lights outside the house helped <b>deter</b> burglars from attempting to break in." 
+        } 
+    ];
+
     function UpdateExample() {
         document.getElementById('example_container').innerHTML = 'Waiting for an example...';
 
@@ -72,7 +85,12 @@ def prepare(html, card, context):
             word = `SOURCE_HTML`;
         }
 
-        // document.getElementById('example_container').innerHTML = word;
+        card_messages.push(
+        {
+           "role": "user",
+            "content": "Please give me another sentence for the word or phrase '" + word + "', use the same language." 
+        });
+        
         fetch(`https://api.openai.com/v1/chat/completions`, {
             method: 'POST',
             headers: {
@@ -81,21 +99,8 @@ def prepare(html, card, context):
             },
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
-                temperature: 0.42,
-                messages: [{
-                        "role": "system",
-                        "content": "You are an language teacher. Please provide one meaningful example for a provided word or phrase. The source word or phrase should be bolded using <b> tags. Do not write anything else except the example."
-                    }, {
-                        "role": "user",
-                        "content": "Please give me a sentence for the word or phrase 'to deter', use the same language." 
-                    }, {
-                        "role": "assistant",
-                        "content": "The bright lights outside the house helped <b>deter</b> burglars from attempting to break in." 
-                    }, {
-                        "role": "user",
-                        "content": "Please give me a sentence for the word or phrase '" + word + "', use the same language." 
-                    }
-                ]
+                temperature: 0.66,
+                messages: card_messages
             })
         })
         .then(response => {
@@ -111,6 +116,12 @@ def prepare(html, card, context):
         .then(data => {
             if (data.choices && data.choices.length > 0) {
                 const example = data.choices[0].message.content.trim();
+                card_messages.push(
+                {
+                   "role": "assistant",
+                    "content": example 
+                });
+
                 document.getElementById('example_container').innerHTML = example;
             } else {
                 document.getElementById('example_container').innerHTML = 'No completion found or error in response data.';
@@ -125,6 +136,5 @@ def prepare(html, card, context):
     regenExampleButton.addEventListener("click", UpdateExample);
 
     </script>""".replace("YOUR_ACTUAL_API_KEY_HERE", api_key).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
-
 
 gui_hooks.card_will_show.append(prepare)
