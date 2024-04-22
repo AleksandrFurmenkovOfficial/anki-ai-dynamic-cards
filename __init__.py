@@ -1,32 +1,14 @@
 import os
-import sys
-from typing import Tuple
-from anki import hooks
-from anki.template import TemplateRenderContext, TemplateRenderOutput
-from aqt import mw
-from PyQt5.QtWidgets import QInputDialog
+import re
+from aqt import mw, gui_hooks
+from PyQt6.QtWidgets import QInputDialog
 
 addon_name = "anki-ai-dynamic-cards"
 addon_path = os.path.join(mw.pm.addonFolder(), addon_name)
-sys.path.append(addon_path)
-import openai
-
-is_api_key_valid = False
-
-def on_card_did_render(output: TemplateRenderOutput, context: TemplateRenderContext):
-    if not is_api_key_valid:
-        return
-
-    try:
-        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[
-            {"role": "system", "content": "You are an english teacher. You should give 3 examples, each on a new line via <br> tag, for the word which user will provide. The source word should be bold via <b> tags."}, 
-            {"role": "user", "content": output.question_text}])
-        output.question_text = completion.choices[0].message.content
-    except:
-        pass
-
 api_key_file = os.path.join(addon_path, "api_key.txt")
+
 api_key = ""
+
 try:
     with open(api_key_file, "r") as file:
         api_key = file.read()
@@ -42,13 +24,95 @@ if api_key == "":
     except:
         pass
 
-try:
-    if api_key != "":
-        openai.api_key = api_key
-        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "system", "content": "Hi!"}])
-        is_api_key_valid = True
-except:
-    if (os.path.isfile(api_key_file)):
-        os.remove(api_key_file)
+def remove_style_tags(text):
+    cleaned_text = re.sub(r'<style.*?>.*?</style>', '', text, flags=re.DOTALL)
+    return cleaned_text
 
-hooks.card_did_render.append(on_card_did_render)
+def prepare(html, card, context):
+    if context != "reviewQuestion":
+        return html
+
+    return """
+    <style>.card {
+    font-family: arial;
+    font-size: 20px;
+    text-align: center;
+    color: black;
+    background-color: white;
+    }</style>
+
+    <div id='example_container'>Waiting for an update...</div>
+    <div id="text_extracter"></div>
+
+    <script>
+    function extractText() {
+        var container = document.getElementById('text_extracter');
+        var text = container.textContent || container.innerText;
+        return text;
+    }
+
+    onUpdateHook.push(function () {
+        document.getElementById('example_container').innerHTML = 'Waiting for an example...';
+
+        let word = "";
+
+        var boldElements = document.querySelectorAll('b');
+        boldElements.forEach(function(element) {
+            word = element.textContent;
+        });
+
+        if (!word) {
+            document.getElementById('text_extracter').innerHTML = 'SOURCE_HTML';
+            word = extractText();
+            document.getElementById('text_extracter').innerHTML = '';
+        }
+
+        if (!word) {
+            word = `SOURCE_HTML`;
+        }
+
+        // document.getElementById('example_container').innerHTML = word;
+        fetch(`https://api.openai.com/v1/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_ACTUAL_API_KEY_HERE'
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [{
+                        "role": "system",
+                        "content": "You are an English teacher. Please provide one meaningful example for a provided word or phrase. The source word or phrase should be bolded using <b> tags. Do not write anything else except the example."
+                    }, {
+                        "role": "user",
+                        "content": "Please give me another example for the English word or phrase '" + word + "'" 
+                    }
+                ]
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById('example_container').innerHTML = 'API request successful. Parsing data...';
+                return response.json();
+            } else {
+                return response.json().then(errorContent => {
+                    document.getElementById('example_container').innerHTML = 'Error with API request. Status: ' + response.status + ' Error content: ' + JSON.stringify(errorContent);
+                });
+            }
+        })
+        .then(data => {
+            if (data.choices && data.choices.length > 0) {
+                const example = data.choices[0].message.content.trim();
+                document.getElementById('example_container').innerHTML = example;
+            } else {
+                document.getElementById('example_container').innerHTML = 'No completion found or error in response data.';
+            }
+        })
+        .catch(error => {
+            document.getElementById('example_container').innerHTML = 'Error: ' + error.message;
+        });
+    });
+    </script>""".replace("YOUR_ACTUAL_API_KEY_HERE", api_key).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
+
+
+gui_hooks.card_will_show.append(prepare)
