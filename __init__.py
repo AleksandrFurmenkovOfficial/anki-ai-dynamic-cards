@@ -114,7 +114,7 @@ def prepare(html, card, context):
             },
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
-                temperature: 0.6,
+                temperature: 0.42,
                 messages: card_messages
             })
         })
