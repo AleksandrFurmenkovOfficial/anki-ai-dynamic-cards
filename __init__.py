@@ -3,7 +3,7 @@ import re
 from aqt import mw, gui_hooks
 from PyQt6.QtWidgets import QInputDialog
 
-addon_name = "anki-ai-dynamic-cards"
+addon_name = "895469405"
 addon_path = os.path.join(mw.pm.addonFolder(), addon_name)
 api_key_file = os.path.join(addon_path, "api_key.txt")
 
@@ -43,6 +43,7 @@ def prepare(html, card, context):
 
     <div id='example_container'>Waiting for an update...</div>
     <div id="text_extracter"></div>
+    <button id="regenExampleButton">Next example</button>
 
     <script>
     function extractText() {
@@ -51,7 +52,7 @@ def prepare(html, card, context):
         return text;
     }
 
-    onUpdateHook.push(function () {
+    function UpdateExample() {
         document.getElementById('example_container').innerHTML = 'Waiting for an example...';
 
         let word = "";
@@ -80,12 +81,19 @@ def prepare(html, card, context):
             },
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
+                temperature: 0.42,
                 messages: [{
                         "role": "system",
-                        "content": "You are an English teacher. Please provide one meaningful example for a provided word or phrase. The source word or phrase should be bolded using <b> tags. Do not write anything else except the example."
+                        "content": "You are an language teacher. Please provide one meaningful example for a provided word or phrase. The source word or phrase should be bolded using <b> tags. Do not write anything else except the example."
                     }, {
                         "role": "user",
-                        "content": "Please give me another example for the English word or phrase '" + word + "'" 
+                        "content": "Please give me a sentence for the word or phrase 'to deter', use the same language." 
+                    }, {
+                        "role": "assistant",
+                        "content": "The bright lights outside the house helped <b>deter</b> burglars from attempting to break in." 
+                    }, {
+                        "role": "user",
+                        "content": "Please give me a sentence for the word or phrase '" + word + "', use the same language." 
                     }
                 ]
             })
@@ -111,7 +119,11 @@ def prepare(html, card, context):
         .catch(error => {
             document.getElementById('example_container').innerHTML = 'Error: ' + error.message;
         });
-    });
+    }
+
+    onUpdateHook.push(UpdateExample);
+    regenExampleButton.addEventListener("click", UpdateExample);
+
     </script>""".replace("YOUR_ACTUAL_API_KEY_HERE", api_key).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
 
 
