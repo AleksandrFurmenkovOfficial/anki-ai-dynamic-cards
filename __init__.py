@@ -41,18 +41,43 @@ def prepare(html, card, context):
     background-color: white;
     }</style>
 
-    <div id='example_container'>Waiting for an update...</div>
-    <div id="text_extracter"></div>
+    <div id="example_container">Waiting for an update...</div>
+    <div id="text_extracter" hidden></div>
+    <div id="messages" hidden></div>
     <button id="regenExampleButton">Next example</button>
 
     <script>
-    function extractText() {
+
+    function extractText(html) {
         var container = document.getElementById('text_extracter');
+        container.innerHTML = html;
         var text = container.textContent || container.innerText;
+        document.getElementById('text_extracter').innerHTML = '';
         return text;
     }
+    
+    function getRandomTopics() {
+        const topics = [
+            "news", "politics", "science", "home", "work",
+            "shop", "friends", "bank", "sports", "travel",
+            "education", "health", "technology", "entertainment",
+            "nature", "art", "cooking", "tv show", "AGI"
+        ];
+        let selectedTopics = [];
+        
+        while (selectedTopics.length < 3) {
+            const randomIndex = Math.floor(Math.random() * topics.length);
+            const topic = topics[randomIndex];
+            if (!selectedTopics.includes(topic)) {
+                selectedTopics.push(topic);
+            }
+        }
+        
+        return selectedTopics.join(", ");
+    }
 
-    let card_messages = [
+    function UpdateExample() {   
+        let card_messages = [
         {
             "role": "system",
             "content": "You are an language teacher. Please provide a meaningful example for a provided word or phrase. The source word or phrase should be bolded using <b> tags. Do not write anything else except the example."
@@ -62,33 +87,23 @@ def prepare(html, card, context):
         }, {
             "role": "assistant",
             "content": "The bright lights outside the house helped <b>deter</b> burglars from attempting to break in." 
-        } 
-    ];
+        }];
 
-    function UpdateExample() {
         document.getElementById('example_container').innerHTML = 'Waiting for an example...';
 
         let word = "";
-
-        var boldElements = document.querySelectorAll('b');
-        boldElements.forEach(function(element) {
+        document.querySelectorAll('b').forEach(function(element) {
             word = element.textContent;
         });
 
         if (!word) {
-            document.getElementById('text_extracter').innerHTML = 'SOURCE_HTML';
-            word = extractText();
-            document.getElementById('text_extracter').innerHTML = '';
-        }
-
-        if (!word) {
-            word = `SOURCE_HTML`;
+            word = extractText('SOURCE_HTML');
         }
 
         card_messages.push(
         {
-           "role": "user",
-            "content": "Please give me another sentence for the word or phrase '" + word + "', use the same language." 
+            "role": "user",
+            "content": "Please give me another sentence for '" + word + "'. For the example use these topics " + getRandomTopics() 
         });
         
         fetch(`https://api.openai.com/v1/chat/completions`, {
@@ -99,7 +114,7 @@ def prepare(html, card, context):
             },
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
-                temperature: 0.66,
+                temperature: 0.6,
                 messages: card_messages
             })
         })
@@ -134,7 +149,7 @@ def prepare(html, card, context):
 
     onUpdateHook.push(UpdateExample);
     regenExampleButton.addEventListener("click", UpdateExample);
-
-    </script>""".replace("YOUR_ACTUAL_API_KEY_HERE", api_key).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
+    </script>
+    """.replace("YOUR_ACTUAL_API_KEY_HERE", api_key).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
 
 gui_hooks.card_will_show.append(prepare)
