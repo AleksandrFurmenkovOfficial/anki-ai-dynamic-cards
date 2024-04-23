@@ -6,7 +6,7 @@ Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example s
 
 ## Installation
 To install Anki AI Dynamic Cards, you need to download the add-on package `anki-ai-dynamic-cards.zip` and install it manually. You can do this by following these steps:
-- Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v2)
+- Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v3)
 - Find out an Anki add-ons directory. In Anki, select Tools > Add-ons > View Files. This will open the Anki add-ons directory
 - Extract the downloaded package `anki-ai-dynamic-cards.zip` into the add-ons directory
 - Restart Anki
