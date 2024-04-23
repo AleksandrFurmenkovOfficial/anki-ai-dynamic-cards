@@ -5,7 +5,11 @@ Have you ever noticed how frustrating it is when learning a new word or phrase, 
 Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example sentences related to words or phrases you are learning, using the artificial intelligence tool ChatGPT. This add-on provides a unique way to improve the effectiveness of memorizing new words and their usage in context, giving users the ability to practice real-world scenarios. These generated examples don't stored in database.
 
 ## Installation
-To install Anki AI Dynamic Cards, you need to download the add-on package `anki-ai-dynamic-cards.zip` and install it manually. You can do this by following these steps:
+
+From Anki app (Qt6):
+- Tools -> Add-ons -> Get Add-ons... -> code [895469405](https://ankiweb.net/shared/info/895469405)
+
+To install Anki AI Dynamic Cards manually, you need to download the add-on package from releases and install it manually. You can do this by following these steps:
 - Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v3)
 - Find out an Anki add-ons directory. In Anki, select Tools > Add-ons > View Files. This will open the Anki add-ons directory
 - Extract the downloaded package `anki-ai-dynamic-cards.zip` into the add-ons directory
