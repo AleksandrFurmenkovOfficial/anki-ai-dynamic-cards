@@ -11,10 +11,16 @@ PROVIDERS = {
         "base_url": "https://api.openai.com/v1/chat/completions",
         "default_model": "gpt-5-nano"
     },
-    "gemini": {
+    "google-gemini": {
         "name": "Google Gemini",
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         "default_model": "gemini-2.5-flash"
+    },
+    "google-gemma": {
+        "name": "Google Gemma",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "default_model": "gemma-3-27b-it",
+        "supports_system": False
     },
     "anthropic": {
         "name": "Anthropic",
@@ -188,6 +194,7 @@ def prepare(html, card, context):
     provider = PROVIDERS.get(provider_key, PROVIDERS["openai"])
     model = config.get("model") or provider["default_model"]
     base_url = provider["base_url"]
+    supports_system = provider.get("supports_system", True)
 
     return """
     <style>.card {
@@ -207,7 +214,8 @@ def prepare(html, card, context):
         const API_CONFIG = {
             apiKey: 'API_KEY_PLACEHOLDER',
             baseUrl: 'BASE_URL_PLACEHOLDER',
-            model: 'MODEL_PLACEHOLDER'
+            model: 'MODEL_PLACEHOLDER',
+            supportsSystem: SUPPORTS_SYSTEM_PLACEHOLDER
         };
 
         const AI_DYNAMIC_CARDS_STATE = (function () {
@@ -356,6 +364,11 @@ def prepare(html, card, context):
                 ...fewShotMessages,
                 {"role": "user", "content": userMessage}
             ];
+            const messagesWithoutSystem = [
+                ...fewShotMessages,
+                {"role": "user", "content": systemPrompt + "\\n\\n" + userMessage}
+            ];
+            const messages = API_CONFIG.supportsSystem ? messagesWithSystem : messagesWithoutSystem;
 
             const retryDelaysMs = [1000, 2000];
             let lastError = null;
@@ -388,7 +401,7 @@ def prepare(html, card, context):
                         body: JSON.stringify({
                             model: API_CONFIG.model,
                             temperature: 1,
-                            messages: messagesWithSystem
+                            messages: messages
                         })
                     });
 
@@ -408,8 +421,6 @@ def prepare(html, card, context):
                         renderFinalError(exampleContainer, currentWord, lastError);
                         return;
                     }
-
-                    exampleContainer.textContent = 'API request successful. Parsing data...';
 
                     let data = null;
                     try {
@@ -488,6 +499,6 @@ def prepare(html, card, context):
         setupDynamicCards();
     })();
     </script>
-    """.replace("API_KEY_PLACEHOLDER", api_key).replace("BASE_URL_PLACEHOLDER", base_url).replace("MODEL_PLACEHOLDER", model).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
+    """.replace("API_KEY_PLACEHOLDER", api_key).replace("BASE_URL_PLACEHOLDER", base_url).replace("MODEL_PLACEHOLDER", model).replace("SUPPORTS_SYSTEM_PLACEHOLDER", str(supports_system).lower()).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
 
 gui_hooks.card_will_show.append(prepare)

@@ -8,6 +8,7 @@ Anki AI Dynamic Cards is an add-on for Anki that dynamically generates example s
 
 - **OpenAI** (GPT models)
 - **Google Gemini**
+- **Google Gemma** (Gemma models)
 - **Anthropic** (Claude models)
 - **Grok** (X.ai)
 - **DeepSeek**
@@ -41,7 +42,7 @@ You can configure the add-on in two ways:
 2. **Standard Anki Config**: Tools → Add-ons → Select add-on → Config
 
 Configuration options:
-- `provider`: AI provider (`openai`, `gemini`, `anthropic`, `grok`, `deepseek`, `openrouter`)
+- `provider`: AI provider (`openai`, `google-gemini`, `google-gemma`, `anthropic`, `grok`, `deepseek`, `openrouter`)
 - `api_key`: Your API key for the selected provider
 - `model`: (optional) Specific model to use. If empty, uses default model for provider
 
