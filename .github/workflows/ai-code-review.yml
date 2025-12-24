@@ -1,5 +1,9 @@
 name: AI Code Review
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -7,13 +11,15 @@ on:
 jobs:
   ai_code_review:
     runs-on: ubuntu-latest
-
     steps:
     - name: AI Code Review
-      uses: AleksandrFurmenkovOfficial/ai-code-review@v0.4.1
+      uses: AleksandrFurmenkovOfficial/ai-code-review@v1.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
         owner: ${{ github.repository_owner }}
         repo: ${{ github.event.repository.name }}
         pr_number: ${{ github.event.number }}
+        
+        ai_provider: 'google'
+        google_api_key: ${{ secrets.GOOGLE_API_KEY }}
+        google_model: 'gemini-3-pro-preview'
