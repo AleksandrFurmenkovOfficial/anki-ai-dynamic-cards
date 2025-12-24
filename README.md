@@ -20,11 +20,40 @@ From Anki app (Qt6):
 - Tools -> Add-ons -> Get Add-ons... -> code [895469405](https://ankiweb.net/shared/info/895469405)
 - Restart Anki
 - Select your AI provider and enter API key in the dialog box when prompted
+- <img width="504" height="280" alt="image" src="https://github.com/user-attachments/assets/d9d63a59-6314-4441-8403-89ef83c20c66" />
+
+Add-on configuration:
+```
+{
+    "_default_models": {
+        "anthropic": "claude-haiku-4-5",
+        "deepseek": "deepseek-chat",
+        "google-gemini": "gemini-2.5-flash",
+        "google-gemma": "gemma-3-27b-it",
+        "grok": "grok-4-1-fast-non-reasoning",
+        "openai": "gpt-5-nano",
+        "openrouter": "openai/gpt-5-nano"
+    },
+    "_provider_options": "openai, google-gemini, google-gemma, anthropic, grok, deepseek, openrouter",
+    "_provider_urls": {
+        "anthropic": "https://api.anthropic.com/v1/messages",
+        "deepseek": "https://api.deepseek.com/chat/completions",
+        "google-gemini": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "google-gemma": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "grok": "https://api.x.ai/v1/chat/completions",
+        "openai": "https://api.openai.com/v1/chat/completions",
+        "openrouter": "https://openrouter.ai/api/v1/chat/completions"
+    },
+    "api_key": "",
+    "model": "",
+    "provider": "grok"
+}
+```
 
 To install Anki AI Dynamic Cards manually, you need to download the add-on package from releases and install it manually. You can do this by following these steps:
-- Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v3)
+- Download the add-on package from the [release page](https://github.com/AleksandrFurmenkovOfficial/anki-ai-dynamic-cards/releases/tag/v4)
 - Find out an Anki add-ons directory. In Anki, select Tools > Add-ons > View Files. This will open the Anki add-ons directory
-- Extract the downloaded package `anki-ai-dynamic-cards.zip` into the add-ons directory
+- Extract the downloaded package `ai-dynamic-cards.ankiaddon` into the add-ons directory
 - Restart Anki
 - Select your AI provider and enter API key in the dialog box when prompted
 
