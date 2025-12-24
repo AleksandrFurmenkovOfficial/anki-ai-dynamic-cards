@@ -24,7 +24,7 @@ PROVIDERS = {
     },
     "anthropic": {
         "name": "Anthropic",
-        "base_url": "https://api.anthropic.com/v1/chat/completions",
+        "base_url": "https://api.anthropic.com/v1/messages",
         "default_model": "claude-haiku-4-5"
     },
     "grok": {
@@ -215,6 +215,7 @@ def prepare(html, card, context):
             apiKey: 'API_KEY_PLACEHOLDER',
             baseUrl: 'BASE_URL_PLACEHOLDER',
             model: 'MODEL_PLACEHOLDER',
+            providerKey: 'PROVIDER_KEY_PLACEHOLDER',
             supportsSystem: SUPPORTS_SYSTEM_PLACEHOLDER
         };
 
@@ -328,6 +329,76 @@ def prepare(html, card, context):
                 'Error (' + escapeHtml(code) + '): ' + escapeHtml(message);
         }
 
+        function buildHeaders(config) {
+            const headers = {'Content-Type': 'application/json'};
+            if (config.providerKey === 'anthropic') {
+                headers['x-api-key'] = config.apiKey;
+                headers['anthropic-version'] = '2023-06-01';
+                headers['anthropic-dangerous-direct-browser-access'] = 'true';
+            } else {
+                headers['Authorization'] = 'Bearer ' + config.apiKey;
+            }
+            return headers;
+        }
+
+        function describeNetworkError(error, config) {
+            const parts = [];
+            if (error) {
+                if (error.name) {
+                    parts.push(error.name);
+                }
+                if (error.message && error.message !== error.name) {
+                    parts.push(error.message);
+                }
+            }
+            parts.push('provider=' + config.providerKey);
+            parts.push('url=' + config.baseUrl);
+            if (config.providerKey === 'anthropic') {
+                parts.push('hint=direct browser access may be blocked; consider Python proxy');
+            }
+            return parts.filter(Boolean).join(' | ');
+        }
+
+        function buildRequestBody(config, messages, messagesPlain, systemPrompt) {
+            if (config.providerKey === 'anthropic') {
+                const body = {
+                    model: config.model,
+                    max_tokens: 256,
+                    temperature: 1,
+                    messages: messagesPlain
+                };
+                if (config.supportsSystem) {
+                    body.system = systemPrompt;
+                }
+                return body;
+            }
+            return {
+                model: config.model,
+                temperature: 1,
+                messages: messages
+            };
+        }
+
+        function extractExampleText(data, providerKey) {
+            if (providerKey === 'anthropic') {
+                if (data && Array.isArray(data.content)) {
+                    const parts = data.content
+                        .filter(part => part && part.type === 'text' && typeof part.text === 'string')
+                        .map(part => part.text);
+                    if (parts.length > 0) {
+                        return parts.join('').trim();
+                    }
+                }
+                if (data && typeof data.content === 'string') {
+                    return data.content.trim();
+                }
+            }
+            if (data && data.choices && data.choices.length > 0 && data.choices[0].message) {
+                return data.choices[0].message.content.trim();
+            }
+            return '';
+        }
+
         async function UpdateExample() {
             const exampleContainer = document.getElementById('example_container');
             const sourceDiv = document.getElementById('source_content');
@@ -359,10 +430,13 @@ def prepare(html, card, context):
 
             const userMessage = "Please give me another sentence for '" + currentWord + "'. For the example use these topics " + getRandomTopics();
 
-            const messagesWithSystem = [
-                {"role": "system", "content": systemPrompt},
+            const messagesPlain = [
                 ...fewShotMessages,
                 {"role": "user", "content": userMessage}
+            ];
+            const messagesWithSystem = [
+                {"role": "system", "content": systemPrompt},
+                ...messagesPlain
             ];
             const messagesWithoutSystem = [
                 ...fewShotMessages,
@@ -394,15 +468,8 @@ def prepare(html, card, context):
                 try {
                     const response = await fetch(API_CONFIG.baseUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + API_CONFIG.apiKey
-                        },
-                        body: JSON.stringify({
-                            model: API_CONFIG.model,
-                            temperature: 1,
-                            messages: messages
-                        })
+                        headers: buildHeaders(API_CONFIG),
+                        body: JSON.stringify(buildRequestBody(API_CONFIG, messages, messagesPlain, systemPrompt))
                     });
 
                     if (!exampleContainer.isConnected || AI_DYNAMIC_CARDS_STATE.activeRequest !== requestId) {
@@ -438,8 +505,9 @@ def prepare(html, card, context):
                         return;
                     }
 
-                    if (data && data.choices && data.choices.length > 0) {
-                        let example = data.choices[0].message.content.trim();
+                    const exampleText = extractExampleText(data, API_CONFIG.providerKey);
+                    if (exampleText) {
+                        let example = exampleText;
                         example = example.replace(/\\*\\*(.+?)\\*\\*/g, '<b>$1</b>');
                         exampleContainer.innerHTML = example;
                         return;
@@ -457,7 +525,7 @@ def prepare(html, card, context):
                         return;
                     }
 
-                    lastError = {code: 'network_error', message: error && error.message ? error.message : String(error)};
+                    lastError = {code: 'network_error', message: describeNetworkError(error, API_CONFIG)};
                     if (attempt < retryDelaysMs.length) {
                         continue;
                     }
@@ -499,6 +567,6 @@ def prepare(html, card, context):
         setupDynamicCards();
     })();
     </script>
-    """.replace("API_KEY_PLACEHOLDER", api_key).replace("BASE_URL_PLACEHOLDER", base_url).replace("MODEL_PLACEHOLDER", model).replace("SUPPORTS_SYSTEM_PLACEHOLDER", str(supports_system).lower()).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
+    """.replace("API_KEY_PLACEHOLDER", api_key).replace("BASE_URL_PLACEHOLDER", base_url).replace("MODEL_PLACEHOLDER", model).replace("PROVIDER_KEY_PLACEHOLDER", provider_key).replace("SUPPORTS_SYSTEM_PLACEHOLDER", str(supports_system).lower()).replace("SOURCE_HTML", remove_style_tags(html.replace('\n', '')))
 
 gui_hooks.card_will_show.append(prepare)
