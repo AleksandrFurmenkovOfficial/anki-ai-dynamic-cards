@@ -36,6 +36,13 @@ To install the addon directly from the sources you need:
 
 ## Configuration
 
+Quick setup:
+- Open **Tools ƒ+' AI Dynamic Cards Settings**
+- Choose a provider
+- Paste your API key
+- (Optional) Set a model; leave empty to use the provider's default
+- Click **Save**
+
 You can configure the add-on in two ways:
 
 1. **Settings Dialog**: Tools → AI Dynamic Cards Settings
