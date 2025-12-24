@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(powershell -Command \"Compress-Archive -Path ''__init__.py'', ''manifest.json'' -DestinationPath ''ai-dynamic-cards.ankiaddon'' -Force\")",
+      "Bash(powershell -Command:*)"
+    ]
+  }
+}
