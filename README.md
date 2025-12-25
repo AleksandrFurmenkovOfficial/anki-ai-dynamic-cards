@@ -22,6 +22,14 @@ From Anki app (Qt6):
 - Select your AI provider and enter API key in the dialog box when prompted
 - <img width="504" height="280" alt="image" src="https://github.com/user-attachments/assets/d9d63a59-6314-4441-8403-89ef83c20c66" />
 
+### How it looks:
+1. Original simple card (remains unmodified). <br> <img width="502" height="539" alt="image" src="https://github.com/user-attachments/assets/5c69b9a1-7373-4031-926f-a92169bf711f" />
+2. The add-on takes the front of the card and uses AI to generate a new, unique sentence. <img width="482" height="226" alt="image" src="https://github.com/user-attachments/assets/c3e4898c-1846-4355-bc0e-52a3992f1043" />
+3. Now you have a new unique sentence that includes the learnable word. <img width="1435" height="242" alt="image" src="https://github.com/user-attachments/assets/752d0e3c-ef6b-4ec6-9456-d80c819a1a8c" />
+4. You can generate a new example with the word by pressing "Next Example" if needed. <img width="1717" height="192" alt="image" src="https://github.com/user-attachments/assets/669965f5-1ade-455e-8ca7-1c80b1f876bc" />
+5. These examples are generated in real-time and are not stored, ensuring you get a unique context for your words each time.
+
+
 Add-on configuration:
 ```
 {
